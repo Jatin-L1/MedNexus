@@ -36,14 +36,14 @@ export default function Navbar() {
           
           <div className="hidden md:flex space-x-8">
             {[
-              { name: 'Disease Prediction', icon: Brain },
-              { name: 'AI Assistance', icon: Activity },
-              { name: 'Find a Hospital', icon: Hospital },
-              { name: 'Register as Professional', icon: AlertCircle },
+              { name: 'Disease Prediction', icon: Brain, href: '/predict' },
+              { name: 'AI Assistance', icon: Activity, href: '/ai' },
+              { name: 'Find a Hospital', icon: Hospital, href: 'hospital' },
+              { name: 'Register as Professional', icon: AlertCircle, href: '/register' },
             ].map((item, index) => (
               <motion.a
                 key={item.name}
-                href="#"
+                href={item.href}
                 className="flex items-center space-x-2 text-gray-300 hover:text-white group relative"
                 whileHover={{ scale: 1.05 }}
                 initial={{ opacity: 0, x: 20 }}
