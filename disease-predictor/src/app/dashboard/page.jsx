@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, Bell, Moon, Sun, Check, X, Phone, MessageCircle } from 'lucide-react';
+import { ChatDialog } from "@/components/chat-dialog";
 
 const DoctorDashboard = () => {
   const [isActive, setIsActive] = useState(true);
@@ -158,13 +159,7 @@ const DoctorDashboard = () => {
                 >
                   <Phone className="w-5 h-5" />
                 </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="p-2 bg-gray-800/50 rounded-lg"
-                >
-                  <MessageCircle className="w-5 h-5" />
-                </motion.button>
+                <ChatDialog />
               </div>
             </div>
             <div className="bg-gray-800/50 rounded-lg h-[calc(100%-4rem)] flex items-center justify-center">
