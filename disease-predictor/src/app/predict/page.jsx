@@ -329,7 +329,7 @@
 "use client";
 import { useState, useEffect } from 'react';
 import { Sparkles, Activity, Brain, AlertCircle, Scan, BarChart2, Target } from 'lucide-react';
-import GeminiLoader from '../predict/GeminiLoader'
+import GeminiLoader from './GeminiLoader'
 
 const DiseasePredictor = () => {
   const [selectedSymptoms, setSelectedSymptoms] = useState(['', '', '', '', '']);
