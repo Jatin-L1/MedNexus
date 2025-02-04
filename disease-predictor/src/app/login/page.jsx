@@ -4,17 +4,31 @@ import { motion } from 'framer-motion';
 import { UserCog, Lock, LogIn } from 'lucide-react';
 import Link from 'next/link'; // Import Link from next/link
 import { useRouter } from 'next/navigation'; // Use useRouter from next/navigation in client components
+import axios from 'axios';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const router = useRouter(); // Correct usage of useRouter
+  const [credentials, setCredentials] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
-  const handleSubmit = (e) => {
+  const handleChange = (e) => {
+    setCredentials({ ...credentials, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // This will be connected to the backend later
-    console.log('Login submitted:', { email, password });
-    router.push('/dashboard'); // Navigate to dashboard after successful login
+    setLoading(true);
+
+    try {
+      const response = await axios.post("http://localhost:3004/api/users/login",credentials);
+      localStorage.setItem("user", JSON.stringify(response.data.user)); // Save session
+      router.push("/"); // Redirect to dashboard
+    } catch (error) {
+        console.error("Login Error:", error); // Add this line
+        alert(error.response?.data?.error || "Login failed.");
+      }finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -27,7 +41,7 @@ const Login = () => {
         <div className="flex items-center gap-4 mb-8">
           <UserCog className="h-8 w-8 text-cyan-400" />
           <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-            Professional Login
+            Login
           </h1>
         </div>
 
@@ -38,10 +52,9 @@ const Login = () => {
               <div className="relative">
                 <input
                   type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  name="email"
+                  required value={credentials.email} onChange={handleChange} 
                   className="w-full bg-navy-900/50 border border-gray-700 rounded-lg p-3 pl-10 text-gray-300"
-                  required
                 />
                 <UserCog className="absolute left-3 top-3.5 h-5 w-5 text-gray-500" />
               </div>
@@ -52,10 +65,9 @@ const Login = () => {
               <div className="relative">
                 <input
                   type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  name='password'
+                  required value={credentials.password} onChange={handleChange} 
                   className="w-full bg-navy-900/50 border border-gray-700 rounded-lg p-3 pl-10 text-gray-300"
-                  required
                 />
                 <Lock className="absolute left-3 top-3.5 h-5 w-5 text-gray-500" />
               </div>
@@ -65,6 +77,7 @@ const Login = () => {
           <button
             type="submit"
             className="neon-button w-full flex items-center justify-center gap-2 text-lg"
+            disabled={loading}
           >
             <LogIn className="h-5 w-5" />
             Sign In

@@ -7,7 +7,7 @@ const SECRET_KEY = "idk"; // Replace with a secure secret key
 // User Registration
 exports.register = async (req, res) => {
   try {
-    const { name, email, password, role ,specialisation,carNo} = req.body;
+    const { name, email, password, role ,specialisation,licenseNo,yearsOfExperience} = req.body;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -18,7 +18,7 @@ exports.register = async (req, res) => {
     // Hash password before saving
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = new User({ name, email, password: hashedPassword, role ,specialisation,carNo});
+    const newUser = new User({ name, email, password: hashedPassword, role ,specialisation,licenseNo,yearsOfExperience});
     await newUser.save();
 
     res.status(201).json({ message: "User registered successfully!" });
@@ -47,7 +47,7 @@ exports.login = async (req, res) => {
     // Generate JWT Token
     const token = jwt.sign({ id: user._id, role: user.role }, SECRET_KEY, { expiresIn: "1h" });
 
-    res.json({ message: "Login successful!", user: { id: user._id, name: user.name, email: user.email, role: user.role,specialisation:user.specialisation,carNo:user.carNo ,token } });
+    res.json({ message: "Login successful!", user: { id: user._id, name: user.name, email: user.email, role: user.role,specialisation:user.specialisation,licenseNo:user.licenseNo,yearsOfExperience:user.yearsOfExperience,token } });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
