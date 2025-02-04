@@ -1,3 +1,4 @@
+
 'use client';
 import React, { useState ,useEffect} from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -24,14 +25,55 @@ const redIcon = new L.Icon({
   }); 
   
 
-const DoctorDashboard = () => {
-const [emergencyRequests, setEmergencyRequests] = useState([]);
-const [loading, setLoading] = useState(false);
-const [responderLocation, setResponderLocation] = useState(null);
-const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
-const [socket, setSocket] = useState(null);
-const [isActive, setIsActive] = useState(true);
-const [routeCoords, setRouteCoords] = useState([]);
+  const DoctorDashboard = () => {
+    // Initialize user state with proper null checking
+    const [user, setUser] = useState(() => {
+      if (typeof window !== 'undefined') {
+        const savedUser = localStorage.getItem("user");
+        return savedUser ? JSON.parse(savedUser) : null;
+      }
+      return null;
+    });
+  
+    const [emergencyRequests, setEmergencyRequests] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [responderLocation, setResponderLocation] = useState(null);
+    const [socket, setSocket] = useState(null);
+    const [isActive, setIsActive] = useState(true);
+    const [routeCoords, setRouteCoords] = useState([]);
+  
+    // Add a loading state for initial user check
+    const [isUserLoading, setIsUserLoading] = useState(true);
+  
+    // Update user effect
+    useEffect(() => {
+      if (typeof window !== 'undefined') {
+        const savedUser = localStorage.getItem("user");
+        if (savedUser) {
+          setUser(JSON.parse(savedUser));
+        }
+        setIsUserLoading(false);
+      }
+    }, []);
+  
+    // Rest of your existing code remains the same until the return statement
+  
+    // Early return if user is loading or not found
+    if (isUserLoading) {
+      return (
+        <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
+          <p>Loading...</p>
+        </div>
+      );
+    }
+  
+    if (!user) {
+      return (
+        <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
+          <p>Please log in to access the dashboard</p>
+        </div>
+      );
+    }
 
 
 const toggleResponderStatus = async () => {
