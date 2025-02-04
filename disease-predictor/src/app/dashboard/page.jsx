@@ -6,8 +6,8 @@ import { MapContainer, TileLayer, Marker, Popup,Polyline } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import axios from 'axios';
-// import redIco from '../assets/ca506f6caf2a9dfb39b01910e635c2fd.png';
-import redIco from '../assets/red-marker.png'; // Ensure this path is correct
+import redIco from '../assets/ca506f6caf2a9dfb39b01910e635c2fd.png';
+
 
 
 // Custom Icons
