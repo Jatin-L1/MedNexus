@@ -19,3 +19,33 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.radar-wave {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  background: rgba(59, 130, 246, 0.5); /* Light blue */
+  border-radius: 50%;
+  animation: pulse 2s infinite ease-out;
+  transform: translate(-50%, -50%);
+}
+.radar-wave2{
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: rgba(250, 75, 75, 0.5); /* Light blue */
+  border-radius: 50%;
+  animation: pulse 2s infinite ease-out;
+  transform: translate(-50%, -50%); 
+}
+
+@keyframes pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(3);
+    opacity: 0;
+  }
+}

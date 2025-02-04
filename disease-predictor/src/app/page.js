@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { Activity, Brain, Hospital, AlertCircle, ChevronDown, Github, Twitter, Linkedin, Menu, X } from 'lucide-react';
+import Link from 'next/link';
 
 export default function Home() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -95,8 +96,10 @@ export default function Home() {
               whileTap={{ scale: 0.95 }}
               animate={pulseAnimation}
               transition={{ duration: 2, repeat: Infinity }}
-            >
-              <span className="relative z-10">Send Emergency Signal</span>
+            > <Link href="/Emergency">
+            <span className="relative z-10 cursor-pointer">Send Emergency Signal</span>
+          </Link>
+            
               <motion.div
                 className="absolute inset-0 bg-gradient-to-r from-gray-800 via-gray-600 to-gray-800 opacity-0 group-hover:opacity-20
                            transition-opacity duration-300"

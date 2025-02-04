@@ -1,36 +1,51 @@
-"use client"; // Ensure this component is treated as client-side
+"use client";
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { UserCog, Lock, LogIn } from 'lucide-react';
-import Link from 'next/link'; // Import Link from next/link
-import { useRouter } from 'next/navigation'; // Use useRouter from next/navigation in client components
+import { UserPlus, User, Mail, Lock } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import axios from 'axios';
 
-const Login = () => {
-  const [credentials, setCredentials] = useState({ email: "", password: "" });
-  const [loading, setLoading] = useState(false);
+export default function PatientRegisterForm() {
+    const [loading, setLoading] = useState(false);
+    const [credentials, setCredentials] = useState({
+        name: "",
+        email: "",
+        password: "",
+      });
   const router = useRouter();
 
   const handleChange = (e) => {
-    setCredentials({ ...credentials, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setCredentials((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
+    const payload = {
+      ...credentials,
+      role: "patient",
+    specialization: "",
+    licenseNo: "",
+    yearsOfExperience: ""
+    };
+
     try {
-      const response = await axios.post("http://localhost:3004/api/users/login",credentials);
-      localStorage.setItem("user", JSON.stringify(response.data.user)); // Save session
-      if(response.data.user.role !== "patient") router.push("/dashboard"); // Redirect to patient dashboard
-      router.push("/"); // Redirect to dashboard
-    } catch (error) {
-        console.error("Login Error:", error); // Add this line
-        alert(error.response?.data?.error || "Login failed.");
-      }finally {
-      setLoading(false);
-    }
-  };
+        await axios.post("http://localhost:3004/api/users/register", payload);
+        alert("Account created successfully.");
+        router.push("/login");
+      } catch (error) {
+        console.error(error);
+        alert("Signup failed.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
   return (
     <div className="pt-24 px-4 max-w-md mx-auto">
@@ -40,24 +55,45 @@ const Login = () => {
         className="bg-navy-800/50 backdrop-blur-sm rounded-xl p-8 border border-gray-700"
       >
         <div className="flex items-center gap-4 mb-8">
-          <UserCog className="h-8 w-8 text-cyan-400" />
+          <UserPlus className="h-8 w-8 text-cyan-400" />
           <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-            Login
+            Patient Registration
           </h1>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
+            
+
+            <div>
+              <label className="block text-gray-300 mb-2">Username</label>
+              <div className="relative">
+                <input
+                  type="text"
+                  name="name"
+                  value={credentials.name}
+                  onChange={handleChange}
+                  className="w-full bg-navy-900/50 border border-gray-700 rounded-lg p-3 pl-10 text-gray-300"
+                  placeholder="Choose a unique username"
+                  required
+                />
+                <User className="absolute left-3 top-3.5 h-5 w-5 text-gray-500" />
+              </div>
+            </div>
+
             <div>
               <label className="block text-gray-300 mb-2">Email</label>
               <div className="relative">
                 <input
                   type="email"
                   name="email"
-                  required value={credentials.email} onChange={handleChange} 
+                  value={credentials.email}
+                  onChange={handleChange}
                   className="w-full bg-navy-900/50 border border-gray-700 rounded-lg p-3 pl-10 text-gray-300"
+                  placeholder="Enter your email"
+                  required
                 />
-                <UserCog className="absolute left-3 top-3.5 h-5 w-5 text-gray-500" />
+                <Mail className="absolute left-3 top-3.5 h-5 w-5 text-gray-500" />
               </div>
             </div>
 
@@ -67,8 +103,11 @@ const Login = () => {
                 <input
                   type="password"
                   name='password'
-                  required value={credentials.password} onChange={handleChange} 
+                  value={credentials.password}
+                  onChange={handleChange}
                   className="w-full bg-navy-900/50 border border-gray-700 rounded-lg p-3 pl-10 text-gray-300"
+                  placeholder="Create a strong password"
+                  required
                 />
                 <Lock className="absolute left-3 top-3.5 h-5 w-5 text-gray-500" />
               </div>
@@ -78,10 +117,9 @@ const Login = () => {
           <button
             type="submit"
             className="neon-button w-full flex items-center justify-center gap-2 text-lg"
-            disabled={loading}
           >
-            <LogIn className="h-5 w-5" />
-            Sign In
+            <UserPlus className="h-5 w-5" />
+            Register
           </button>
 
           <div className="relative">
@@ -95,10 +133,10 @@ const Login = () => {
 
           <div className="text-center">
             <Link
-              href="/register"
+              href="/login"
               className="text-cyan-400 hover:text-cyan-300 transition-colors"
             >
-              Register as a Medical Professional
+              Already have an account? Sign In
             </Link>
           </div>
         </form>
@@ -129,6 +167,4 @@ const Login = () => {
       />
     </div>
   );
-};
-
-export default Login;
+}
