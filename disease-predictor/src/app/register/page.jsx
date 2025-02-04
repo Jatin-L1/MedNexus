@@ -3,30 +3,48 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { UserCog, Upload, Shield, Mail, Lock, BadgeCheck, FileText } from 'lucide-react';
 import Link from 'next/link'; // Use Next.js Link instead of react-router-dom Link
+import axios from 'axios';
+import {useRouter} from 'next/navigation';
 
 const Registration = () => {
-  const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    title: '',
-    licenseNumber: '',
-    specialization: '',
-    experience: '',
+  const [credentials, setCredentials] = useState({
+    name: "",
+    email: "",
+    password: "",
+    role: "",
+    specialisation: "", // Keep this even if not shown
+    licenseNo: "",
+    yearsOfExperience: ""
   });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    setCredentials((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
-  const handleSubmit = (e) => {
+  const router = useRouter();
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // This will be connected to the backend later
-    console.log('Form submitted:', formData);
+    setLoading(true);
+
+    const payload = {
+      ...credentials
+    };
+
+    try {
+      await axios.post("http://localhost:3004/api/users/register", payload);
+      alert("Account created successfully.");
+      router.push("/login");
+    } catch (error) {
+      console.error(error);
+      alert("Signup failed.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -60,8 +78,8 @@ const Registration = () => {
                   <label className="block text-gray-300 mb-2">Full Name</label>
                   <input
                     type="text"
-                    name="fullName"
-                    value={formData.fullName}
+                    name="name"
+                    value={credentials.name}
                     onChange={handleChange}
                     className="w-full bg-navy-900/50 border border-gray-700 rounded-lg p-3 text-gray-300"
                     required
@@ -74,7 +92,7 @@ const Registration = () => {
                     <input
                       type="email"
                       name="email"
-                      value={formData.email}
+                      value={credentials.email}
                       onChange={handleChange}
                       className="w-full bg-navy-900/50 border border-gray-700 rounded-lg p-3 pl-10 text-gray-300"
                       required
@@ -88,21 +106,7 @@ const Registration = () => {
                     <input
                       type="password"
                       name="password"
-                      value={formData.password}
-                      onChange={handleChange}
-                      className="w-full bg-navy-900/50 border border-gray-700 rounded-lg p-3 pl-10 text-gray-300"
-                      required
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-gray-300 mb-2">Confirm Password</label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-3.5 h-5 w-5 text-gray-500" />
-                    <input
-                      type="password"
-                      name="confirmPassword"
-                      value={formData.confirmPassword}
+                      value={credentials.password}
                       onChange={handleChange}
                       className="w-full bg-navy-900/50 border border-gray-700 rounded-lg p-3 pl-10 text-gray-300"
                       required
@@ -122,17 +126,16 @@ const Registration = () => {
                 <div>
                   <label className="block text-gray-300 mb-2">Professional Title</label>
                   <select
-                    name="title"
-                    value={formData.title}
+                    name="role"
+                    value={credentials.role}
                     onChange={handleChange}
                     className="w-full bg-navy-900/50 border border-gray-700 rounded-lg p-3 text-gray-300"
                     required
                   >
-                    <option value="">Select title</option>
+                    <option value="">Select Role</option>
                     <option value="doctor">Doctor</option>
                     <option value="nurse">Nurse</option>
-                    <option value="paramedic">Paramedic</option>
-                    <option value="specialist">Medical Specialist</option>
+                    <option value="ambulance">Ambulance</option>
                   </select>
                 </div>
                 <div>
@@ -141,8 +144,8 @@ const Registration = () => {
                     <FileText className="absolute left-3 top-3.5 h-5 w-5 text-gray-500" />
                     <input
                       type="text"
-                      name="licenseNumber"
-                      value={formData.licenseNumber}
+                      name="licenseNo"
+                      value={credentials.licenseNo}
                       onChange={handleChange}
                       className="w-full bg-navy-900/50 border border-gray-700 rounded-lg p-3 pl-10 text-gray-300"
                       required
@@ -153,8 +156,8 @@ const Registration = () => {
                   <label className="block text-gray-300 mb-2">Specialization</label>
                   <input
                     type="text"
-                    name="specialization"
-                    value={formData.specialization}
+                    name="specialisation"
+                    value={credentials.specialisation}
                     onChange={handleChange}
                     className="w-full bg-navy-900/50 border border-gray-700 rounded-lg p-3 text-gray-300"
                     placeholder="e.g., Cardiology, Emergency Medicine"
@@ -165,8 +168,8 @@ const Registration = () => {
                   <label className="block text-gray-300 mb-2">Years of Experience</label>
                   <input
                     type="number"
-                    name="experience"
-                    value={formData.experience}
+                    name="yearsOfExperience"
+                    value={credentials.yearsOfExperience}
                     onChange={handleChange}
                     className="w-full bg-navy-900/50 border border-gray-700 rounded-lg p-3 text-gray-300"
                     min="0"

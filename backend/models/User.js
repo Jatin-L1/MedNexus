@@ -7,7 +7,8 @@ const userSchema = new mongoose.Schema({
   role: { type: String, enum: ["patient", "doctor","nurse","ambulance"], required: true },
   specialisation: { type: String }, // Only applies to doctors
   status: { type: Boolean, default:true}, // Only applies to responders
-  carNo:{type:String,default:null}, // Only applies to ambulance
+  licenseNo:{type:String}, // Only applies to doctors
+  yearsOfExperience:{type:Number}, // Only applies to doctors
 });
 
 module.exports = mongoose.model("User", userSchema);

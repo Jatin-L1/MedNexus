@@ -1,12 +1,12 @@
 'use client';
 import React, { useState ,useEffect} from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, Bell, Moon, Sun, Check, X, Phone, MessageCircle } from 'lucide-react';
+import { MapPin, Moon, Sun, Check, X, Phone, MessageCircle } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup,Polyline } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import axios from 'axios';
-import redIco from '../assets/ca506f6caf2a9dfb39b01910e635c2fd.png';
+
 
 
 // Custom Icons
@@ -17,7 +17,7 @@ const blueIcon = new L.Icon({
 });
 
 const redIcon = new L.Icon({
-    iconUrl: redIco, // Replace with your red marker image URL
+    iconUrl: '/ca506f6caf2a9dfb39b01910e635c2fd.png',
     iconSize: [30, 41],
     iconAnchor: [12, 41],
   }); 
@@ -37,7 +37,7 @@ const toggleResponderStatus = async () => {
     try {
         setIsActive(!isActive);
       // Call the backend API to toggle the doctor's active status
-      const response = await axios.post("http://localhost:3000/api/toggle-active", {
+      const response = await axios.post("http://localhost:3004/api/toggle-active", {
         userId: user.id, // Pass the userId from state
       });
 
@@ -55,7 +55,7 @@ const toggleResponderStatus = async () => {
   const fetchEmergencyRequests = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:3000/api/emergency/requests");
+      const response = await axios.get("http://localhost:3004/api/emergency/requests");
   
       // Filter the requests based on user role and severity
       const filteredRequests = response.data.filter((emergency) => {
@@ -97,7 +97,7 @@ const toggleResponderStatus = async () => {
             const acceptedEmergencies = emergencyRequests.filter((emergency) => emergency.status === "accepted");
 
             acceptedEmergencies.forEach((emergency) => {
-              axios.post("http://localhost:3000/api/emergency/update-location", {
+              axios.post("http://localhost:3004/api/emergency/update-location", {
                 responderId: user.id,
                 location: { lat: latitude, lng: longitude },
                 emergencyId: emergency._id,
@@ -124,7 +124,7 @@ const toggleResponderStatus = async () => {
 
   const getRoute = async (patientLocation, responderLocation) => {
     try {
-      const response = await axios.get("http://localhost:3000/api/directions", {
+      const response = await axios.get("http://localhost:3004/api/directions", {
         params: {
           start: `${responderLocation.lng},${responderLocation.lat}`,
           end: `${patientLocation.lng},${patientLocation.lat}`,
@@ -155,7 +155,7 @@ const toggleResponderStatus = async () => {
     }
 
     try {
-      await axios.post("http://localhost:3000/api/emergency/accept", {
+      await axios.post("http://localhost:3004/api/emergency/accept", {
         responderId: user.id,
         emergencyId,
         patientId,

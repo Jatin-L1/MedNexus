@@ -10,7 +10,7 @@ const app = express();
 app.use(express.json());
 
 // Enable CORS for frontend (http://localhost:5173)
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+app.use(cors({ origin: "http://localhost:3001", credentials: true }));
 
 // Connect to MongoDB
 connectDB();
@@ -40,7 +40,7 @@ app.get("/api/directions", async (req, res) => {
 });
 
 // Start Server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3004;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
