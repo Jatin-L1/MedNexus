@@ -29,9 +29,12 @@ function ConversationDisplayArea({ data, streamdiv, answer }) {
                 ? "bg-indigo-600 text-white"
                 : "bg-gray-800 text-gray-200"
             }`}
-          >
-            {msg.parts[0].text}
-          </div>
+            dangerouslySetInnerHTML={{
+              __html: msg.parts[0].text
+                .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+                .replace(/\n/g, "<br>"),
+            }}
+          />
           {msg.role === "user" && (
             <UserRound className="w-8 h-8 text-indigo-300 rounded-full p-1 bg-gray-700" />
           )}
@@ -40,9 +43,14 @@ function ConversationDisplayArea({ data, streamdiv, answer }) {
       {streamdiv && (
         <div className="flex items-end gap-x-3 justify-start">
           <Brain className="w-8 h-8 text-gray-300" />
-          <div className="max-w-[75%] p-4 rounded-2xl bg-gray-800 text-gray-200 shadow-lg">
-            <p className="text-sm">{answer}</p>
-          </div>
+          <div
+            className="max-w-[75%] p-4 rounded-2xl bg-gray-800 text-gray-200 shadow-lg"
+            dangerouslySetInnerHTML={{
+              __html: answer
+                .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+                .replace(/\n/g, "<br>"),
+            }}
+          />
         </div>
       )}
       <div ref={messagesEndRef} />
@@ -129,14 +137,14 @@ export default function ChatPage() {
 
   return (
     <div className="flex flex-col h-screen bg-gray-900 text-white pt-24">
-        <div className="text-center mb-8">
-          <h1 className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-200 via-white to-gray-300">
-            AI Assistance
-          </h1>
-          <p className="text-gray-400 text-lg font-medium tracking-wider">
-            GEMINI-POWERED MEDICAL AI ASSISTANT • VERSION 1.0
-          </p>
-        </div>
+      <div className="text-center mb-8">
+        <h1 className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-200 via-white to-gray-300">
+          AI Assistance
+        </h1>
+        <p className="text-gray-400 text-lg font-medium tracking-wider">
+          GEMINI-POWERED MEDICAL AI ASSISTANT • VERSION 1.0
+        </p>
+      </div>
       <ConversationDisplayArea data={data} streamdiv={streamdiv} answer={answer} />
       <MessageInput inputRef={inputRef} waiting={waiting} handleClick={handleClick} />
     </div>
