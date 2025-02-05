@@ -208,10 +208,24 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
   };
 
 
-  const handleDoctorArrival = () => {
-    setIsDoctorArrived(true);
-  };
+  
+  const handleDoctorArrival = async (emergencyId) => { // Pass the emergency ID
+    try {
+      console.log(emergencyId);
+      await axios.post("http://localhost:3004/api/emergency/doctor-arrival", {
+        emergencyId: emergencyId,
+        status: "resolved",
+      });
 
+     setIsDoctorArrived(true);
+      alert("Doctor arrival confirmed. Status updated to resolved.");
+
+    } catch (error) {
+      console.error("Error updating doctor arrival status:", error);
+      alert("Failed to confirm doctor arrival.");
+    }
+  };
+  
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col">
       {/* Navbar */}
@@ -348,17 +362,18 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
                 <Ambulance className="w-6 h-6" />
                 <span>{isEmergencyTriggered ? "Emergency Triggered" : "Trigger Emergency"}</span>
               </motion.button>
-              
+              {acceptedEmergencies.map((emergency) => (
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="flex-1 py-4 rounded-lg text-lg font-bold bg-green-500 text-white hover:bg-green-600 flex justify-center items-center space-x-2"
-                onClick={handleDoctorArrival}
-                disabled={!isEmergencyTriggered || isDoctorArrived}
+                onClick={()=>handleDoctorArrival(emergency._id)}
+               
               >
                 <CheckCircle2 className="w-6 h-6" />
                 <span>{isDoctorArrived ? "Doctor Arrived" : "Confirm Doctor Arrival"}</span>
               </motion.button>
+              ))}
             </div>
           </div>
         </div>

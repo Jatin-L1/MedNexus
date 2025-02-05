@@ -2,12 +2,42 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
+
 const SECRET_KEY = "idk"; // Replace with a secure secret key
 
 // User Registration
+
 exports.register = async (req, res) => {
   try {
-    const { name, email, password, role ,specialisation,licenseNo,yearsOfExperience} = req.body;
+    const { 
+      name, 
+      email, 
+      password, 
+      role, 
+      specialisation, 
+      licenseNo, 
+      yearsOfExperience,
+      coverImage 
+    } = req.body;
+
+    // Comprehensive input validation
+    const requiredFields = [
+      { name: 'Name', value: name },
+      { name: 'Email', value: email },
+      { name: 'Password', value: password },
+      { name: 'Role', value: role },
+      { name: 'License Number', value: licenseNo }
+    ];
+
+    const missingFields = requiredFields
+      .filter(field => !field.value)
+      .map(field => field.name);
+
+    if (missingFields.length > 0) {
+      return res.status(400).json({ 
+        error: `Missing required fields: ${missingFields.join(', ')}` 
+      });
+    }
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -15,15 +45,43 @@ exports.register = async (req, res) => {
       return res.status(400).json({ error: "User already exists." });
     }
 
-    // Hash password before saving
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = new User({ name, email, password: hashedPassword, role ,specialisation,licenseNo,yearsOfExperience});
+    // Create new user
+    const newUser = new User({
+      name,
+      email,
+      password: hashedPassword,
+      role,
+      specialisation,
+      licenseNo,
+      yearsOfExperience,
+      coverImage: coverImage || '', // Use uploaded image URL or empty string
+    });
+
     await newUser.save();
 
-    res.status(201).json({ message: "User registered successfully!" });
+    res.status(201).json({ 
+      message: "User registered successfully!", 
+      data: { 
+        name: newUser.name, 
+        email: newUser.email, 
+        role: newUser.role 
+      } 
+    });
+
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Registration error:", {
+      message: error.message,
+      stack: error.stack,
+      body: req.body
+    });
+
+    res.status(500).json({ 
+      error: "Internal server error during registration",
+      details: error.message 
+    });
   }
 };
 

@@ -43,7 +43,7 @@ exports.acceptEmergency = async (req, res) => {
         return res.status(400).json({ error: "Invalid doctor or emergency request" });
       }
   
-      emergencyRequest.status = "accepted";
+      emergencyRequest.status = "inProgress";
       emergencyRequest.responderId = responderId;
       emergencyRequest.responderLocation = responderLocation; 
       emergencyRequest.patientLocation = patientLocation;
@@ -76,7 +76,7 @@ exports.acceptEmergency = async (req, res) => {
 exports.getAcceptedEmergencies = async (req, res) => {
     try {
       // Fetch all accepted emergencies and populate the doctor and patient data
-      const acceptedEmergencies = await Emergency.find({ status: 'accepted' })
+      const acceptedEmergencies = await Emergency.find({ status: 'inProgress' })
         .populate('patientId', 'name location')  // Populate patient data (name, location)
         .populate('responderId', 'name location role licenseNo'); // Populate doctor data (name, location)
   
@@ -100,7 +100,7 @@ exports.getAcceptedEmergencies = async (req, res) => {
   
       // ✅ Correct database update
       const result = await Emergency.updateOne(
-        { _id: emergencyId, responderId: responderId, status: "accepted" },
+        { _id: emergencyId, responderId: responderId, status: "inProgress" },
         {
           $set: {
             "responderLocation": { lat: location.lat, lng: location.lng }
@@ -130,7 +130,7 @@ exports.getAcceptedEmergencies = async (req, res) => {
   
   exports.getEmergencies = async (req, res) => {
     try {
-      const emergencies = await Emergency.find({  status: { $in: ["accepted", "pending"] }}).populate("patientId");
+      const emergencies = await Emergency.find({  status: { $in: [ "pending","inProgress","resolved"] }}).populate("patientId");
       res.json(emergencies);
     } catch (error) {
       console.error(error);

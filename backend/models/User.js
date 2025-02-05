@@ -9,6 +9,8 @@ const userSchema = new mongoose.Schema({
   status: { type: Boolean, default:true}, // Only applies to responders
   licenseNo:{type:String}, // Only applies to doctors
   yearsOfExperience:{type:Number}, // Only applies to doctors
+  coverImage: { type: String, default: "" }, // To store the image URL
+  coverImagePublicId: { type: String, default: "" } // To store the Cloudinary public ID
 });
 
 module.exports = mongoose.model("User", userSchema);

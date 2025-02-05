@@ -51,7 +51,6 @@ const DoctorDashboard = () => {
   const [socket, setSocket] = useState(null);
   const [isActive, setIsActive] = useState(true);
   const [routeCoords, setRouteCoords] = useState([]);
-
   // Add a loading state for initial user check
   const [isUserLoading, setIsUserLoading] = useState(true);
 
@@ -92,24 +91,32 @@ const DoctorDashboard = () => {
   const fetchEmergencyRequests = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(
-        "http://localhost:3004/api/emergency/requests"
-      );
-
-      // Filter the requests based on user role and severity
+      const response = await axios.get("http://localhost:3004/api/emergency/requests");
+  
+      const hasInProgress = response.data.some((e) => e.status === "inProgress");
+  
       const filteredRequests = response.data.filter((emergency) => {
-        switch (user.role) {
-          case "doctor":
-            return emergency.severity === "moderate"; // doctor sees moderate requests
-          case "ambulance":
-            return emergency.severity === "critical"; // ambulance sees critical requests
-          case "nurse":
-            return emergency.severity === "normal"; // nurse sees normal requests
-          default:
-            return true; // If no role, show all
+        // 1️⃣ Check if there's an inProgress emergency
+        if (hasInProgress) {
+          return emergency.status === "inProgress"; // Show only inProgress emergencies
+        } 
+        
+        // 2️⃣ If no inProgress, show pending based on user role
+        if (emergency.status === "pending") {
+          switch (user.role) {
+            case "doctor":
+              return emergency.severity === "moderate"; // doctor sees moderate requests
+            case "ambulance":
+              return emergency.severity === "critical"; // ambulance sees critical requests
+            case "nurse":
+              return emergency.severity === "normal"; // nurse sees normal requests
+            default:
+              return true; // Show all if role is undefined
+          }
         }
+        return false; // Exclude other statuses
       });
-
+  
       setEmergencyRequests(filteredRequests);
       console.log("✅ Fetched emergency requests:", filteredRequests);
     } catch (error) {
@@ -117,6 +124,9 @@ const DoctorDashboard = () => {
     }
     setLoading(false);
   };
+  
+
+  
 
   /** ✅ Get Doctor's Location */
   const getResponderLocation = () => {

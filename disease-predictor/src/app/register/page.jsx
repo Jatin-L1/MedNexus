@@ -6,17 +6,21 @@ import Link from 'next/link'; // Use Next.js Link instead of react-router-dom Li
 import axios from 'axios';
 import {useRouter} from 'next/navigation';
 
+
 const Registration = () => {
   const [credentials, setCredentials] = useState({
     name: "",
     email: "",
     password: "",
     role: "",
-    specialisation: "", // Keep this even if not shown
+    specialisation: "",
     licenseNo: "",
-    yearsOfExperience: ""
+    yearsOfExperience: "",
+    coverImage: null,
   });
   const [loading, setLoading] = useState(false);
+  const [coverPhoto, setCoverPhoto] = useState(null);
+  const [uploadedFileName, setUploadedFileName] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -26,27 +30,68 @@ const Registration = () => {
     }));
   };
 
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const formData = new FormData();
+      formData.append('coverImage', file);  // Changed field name to 'coverPhoto'
+      
+      try {
+        setLoading(true);
+        const response = await axios.post("http://localhost:3004/api/users/upload", formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        
+        setCoverPhoto(response.data.url);
+        setCredentials(prev => ({ ...prev, coverImage: response.data.url }));
+        setUploadedFileName(file.name);
+      } catch (error) {
+        console.error("Upload failed:", error);
+        alert("Cover photo upload failed. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
   const router = useRouter();
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
-    const payload = {
-      ...credentials
-    };
-
+  
+    // Optional: Basic client-side validation
+    const requiredFields = ['name', 'email', 'password', 'role', 'licenseNo'];
+    const missingFields = requiredFields.filter(field => !credentials[field]);
+  
+    if (missingFields.length > 0) {
+      alert(`Please fill in all required fields: ${missingFields.join(', ')}`);
+      setLoading(false);
+      return;
+    }
+  
     try {
-      await axios.post("http://localhost:3004/api/users/register", payload);
-      alert("Account created successfully.");
+      const response = await axios.post(
+        "http://localhost:3004/api/users/register", 
+        credentials,
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      alert("Account created successfully!");
       router.push("/login");
     } catch (error) {
-      console.error(error);
-      alert("Signup failed.");
+      console.error("Registration failed:", error.response?.data || error);
+      alert(
+        error.response?.data?.error || 
+        "Registration failed. Please check your information and try again."
+      );
     } finally {
       setLoading(false);
     }
   };
-
   return (
     <div className="pt-24 px-4 max-w-4xl mx-auto mb-12">
       <motion.div
@@ -181,25 +226,41 @@ const Registration = () => {
 
             {/* Credentials Upload */}
             <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-gray-200 flex items-center gap-2">
-                <Shield className="h-5 w-5 text-cyan-400" />
-                Credentials Verification
-              </h2>
-              <div className="border-2 border-dashed border-gray-700 rounded-lg p-8 text-center bg-navy-900/30">
-                <Upload className="h-12 w-12 text-cyan-400 mx-auto mb-4" />
-                <p className="text-gray-300 mb-2">Upload your medical credentials</p>
-                <p className="text-sm text-gray-400">Drag and drop your files here, or click to select files</p>
-                <input
-                  type="file"
-                  className="hidden"
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  multiple
-                />
-                <button type="button" className="mt-4 px-4 py-2 bg-cyan-500/20 text-cyan-400 rounded-lg hover:bg-cyan-500/30 transition-colors">
-                  Select Files
-                </button>
-              </div>
-            </div>
+        <h2 className="text-xl font-semibold text-gray-200 flex items-center gap-2">
+          <Shield className="h-5 w-5 text-cyan-400" />
+          Profile Photo
+        </h2>
+        <div className="border-2 border-dashed border-gray-700 rounded-lg p-8 text-center bg-navy-900/30">
+          <Upload className="h-12 w-12 text-cyan-400 mx-auto mb-4" />
+          <p className="text-gray-300 mb-2">
+            {uploadedFileName ? `Selected file: ${uploadedFileName}` : 'Upload your Profile Photo'}
+          </p>
+          <p className="text-sm text-gray-400">
+            {loading ? 'Uploading...' : 'Drag and drop your file here, or click to select'}
+          </p>
+          <input
+            type="file"
+            id="fileInput"
+            className="hidden"
+            accept="image/*"
+            onChange={handleFileChange}
+            disabled={loading}
+          />
+          <button
+            type="button"
+            className={`mt-4 px-4 py-2 ${
+              loading 
+                ? 'bg-gray-500 cursor-not-allowed' 
+                : 'bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30'
+            } rounded-lg transition-colors`}
+            onClick={() => document.getElementById('fileInput').click()}
+            disabled={loading}
+          >
+            {loading ? 'Uploading...' : 'Select File'}
+          </button>
+        </div>
+      </div>
+
 
             <div className="flex items-center gap-2 text-gray-300 bg-navy-900/30 p-4 rounded-lg">
               <Shield className="h-5 w-5 text-cyan-400 flex-shrink-0" />

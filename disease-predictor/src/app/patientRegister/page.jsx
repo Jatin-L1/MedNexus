@@ -32,7 +32,8 @@ export default function PatientRegisterForm() {
       role: "patient",
     specialization: "",
     licenseNo: "",
-    yearsOfExperience: ""
+    yearsOfExperience: "",
+    coverImage: "",
     };
 
     try {
