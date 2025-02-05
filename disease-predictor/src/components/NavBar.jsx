@@ -1,11 +1,13 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Brain, Activity, Hospital, AlertCircle } from 'lucide-react';
+import { Brain, Activity, Hospital, AlertCircle, KeyRound, ChevronDown } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 export default function Navbar() {
   const [navBackground, setNavBackground] = useState('transparent');
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -31,15 +33,14 @@ export default function Navbar() {
             }}
             transition={{ duration: 2, repeat: Infinity }}
           >
-            MedNexus
+            <Link href="/">MedNexus</Link>
           </motion.div>
-          
+
           <div className="hidden md:flex space-x-8">
             {[
               { name: 'Disease Prediction', icon: Brain, href: '/predict' },
               { name: 'AI Assistance', icon: Activity, href: '/ai' },
-              { name: 'Find a Hospital', icon: Hospital, href: 'hospital' },
-              { name: 'Register as Professional', icon: AlertCircle, href: '/register' },
+              { name: 'Find a Hospital', icon: Hospital, href: '/hospital' }
             ].map((item, index) => (
               <motion.a
                 key={item.name}
@@ -62,6 +63,41 @@ export default function Navbar() {
                 </span>
               </motion.a>
             ))}
+
+            {/* Dropdown Menu */}
+            <div className="relative">
+              <button
+                className="flex items-center space-x-2 text-gray-300 hover:text-white focus:outline-none"
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+              >
+                <AlertCircle className="w-4 h-4" />
+                <span>Login</span>
+                <ChevronDown className="w-4 h-4" />
+              </button>
+
+              {dropdownOpen && (
+                <motion.div
+                  className="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-lg"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Link
+                    href="/register"
+                    className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white"
+                  >
+                    Register as Professional
+                  </Link>
+                  <Link
+                    href="/login"
+                    className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white"
+                  >
+                    Login
+                  </Link>
+                </motion.div>
+              )}
+            </div>
           </div>
         </div>
       </div>
