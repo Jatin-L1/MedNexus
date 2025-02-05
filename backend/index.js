@@ -8,6 +8,7 @@ require("./websocket");
 
 const app = express();
 app.use(express.json());
+app.use(express.urlencoded({extended: true }));
 
 // Enable CORS for frontend (http://localhost:5173)
 app.use(cors({ origin: "http://localhost:3000", credentials: true }));
@@ -18,6 +19,7 @@ connectDB();
 // Routes
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/emergency", require("./routes/emergencyRoutes"));
+app.use("/api/ai", require("./routes/geminiRoutes"));
 
 app.get("/api/directions", async (req, res) => {
     const { start, end } = req.query;
