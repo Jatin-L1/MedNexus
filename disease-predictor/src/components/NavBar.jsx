@@ -40,7 +40,8 @@ export default function Navbar() {
             {[
               { name: 'Disease Prediction', icon: Brain, href: '/predict' },
               { name: 'AI Assistance', icon: Activity, href: '/ai' },
-              { name: 'Find a Hospital', icon: Hospital, href: '/hospital' }
+              { name: 'Find a Hospital', icon: Hospital, href: '/hospital' },
+              { name: 'Login', icon: KeyRound, href: '/login' }
             ].map((item, index) => (
               <motion.a
                 key={item.name}
@@ -71,7 +72,7 @@ export default function Navbar() {
                 onClick={() => setDropdownOpen(!dropdownOpen)}
               >
                 <AlertCircle className="w-4 h-4" />
-                <span>Login</span>
+                <span>Sign Up</span>
                 <ChevronDown className="w-4 h-4" />
               </button>
 
@@ -90,10 +91,10 @@ export default function Navbar() {
                     Register as Professional
                   </Link>
                   <Link
-                    href="/login"
+                    href="/patientRegister"
                     className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white"
                   >
-                    Login
+                    Register as Patient
                   </Link>
                 </motion.div>
               )}
