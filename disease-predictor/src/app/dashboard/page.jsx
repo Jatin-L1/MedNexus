@@ -178,6 +178,8 @@ const DoctorDashboard = () => {
   };
 
   const getRoute = async (patientLocation, responderLocation) => {
+    if (!patientLocation || !responderLocation) return;
+
     try {
       const response = await axios.get("http://localhost:3004/api/directions", {
         params: {
@@ -263,14 +265,14 @@ const DoctorDashboard = () => {
 
   /** ✅ Re-fetch Emergency Requests When Doctor Moves */
   useEffect(() => {
-    if (responderLocation) {
-      fetchEmergencyRequests();
+    if (
+      emergencyRequests.length > 0 && 
+      emergencyRequests[0]?.patientLocation && 
+      responderLocation
+    ) {
+      getRoute(emergencyRequests[0].patientLocation, responderLocation);
     }
-  }, [responderLocation]);
-
-  useEffect(() => {
-    getRoute(emergencyRequests[0]?.patientLocation, responderLocation);
-  }, [emergencyRequests]);
+  }, [emergencyRequests, responderLocation]);
 
   /** ✅ WebSocket Connection */
   useEffect(() => {
@@ -420,6 +422,10 @@ const DoctorDashboard = () => {
                         {emergency.severity}
                       </span>
                     </div>
+                    <ChatDialog 
+  emergencyId={emergency._id} 
+  userId={user.id} 
+/>
                     <div className="flex items-center text-gray-400 text-sm mb-3">
                       <MapPin className="w-4 h-4 mr-1" />
                       {emergency.status}
