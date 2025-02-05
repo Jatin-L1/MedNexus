@@ -92,35 +92,40 @@ exports.getAcceptedEmergencies = async (req, res) => {
     }
   };
 
-
   exports.updateDoctorLocation = async (req, res) => {
     try {
-      const { responderId, location } = req.body;
-      console.log("Updating doctor location:", responderId, location);
+      const { responderId, location, emergencyId } = req.body;
   
-      if (!responderId || !location) {
-        return res.status(400).json({ error: "Missing responderId or location data" });
-      }
+      console.log(`Updating doctor location: ${responderId}`, location);
   
-      // Update the doctor's location in all emergencies
-      const updatedEmergencies = await Emergency.updateMany(
-        {}, // No filter, update all emergencies
-        { "responderLocation.lat": location.lat, "responderLocation.lng": location.lng },
-        { new: true } // ✅ Ensures we get the updated documents
+      // ✅ Correct database update
+      const result = await Emergency.updateOne(
+        { _id: emergencyId, responderId: responderId, status: "accepted" },
+        {
+          $set: {
+            "responderLocation": { lat: location.lat, lng: location.lng }
+          }
+        }
       );
   
-      if (!updatedEmergencies) {
-        console.error("No emergencies found to update location");
-        return res.status(404).json({ error: "No emergencies found to update location" });
+      if (result.matchedCount === 0) {
+        // ✅ Only send response once
+        return res.status(404).json({ message: "Emergency not found or not accepted." });
       }
   
-      console.log("Updated Emergencies:", updatedEmergencies);
-      res.status(200).json({ message: "Doctor location updated successfully for all emergencies" });
+      // ✅ Success response
+      res.status(200).json({ message: "Location updated successfully." });
+  
     } catch (error) {
-      console.error("Error updating doctor's location for emergencies:", error);
-      res.status(500).json({ error: "Failed to update doctor's location for emergencies" });
+      console.error("❌ Error updating doctor's location:", error);
+  
+      // ✅ Ensure only one response is sent in case of error
+      if (!res.headersSent) {
+        res.status(500).json({ message: "Internal server error." });
+      }
     }
   };
+  
 
   
   exports.getEmergencies = async (req, res) => {

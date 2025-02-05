@@ -58,22 +58,6 @@ const redIcon = new L.Icon({
   
     // Rest of your existing code remains the same until the return statement
   
-    // Early return if user is loading or not found
-    if (isUserLoading) {
-      return (
-        <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
-          <p>Loading...</p>
-        </div>
-      );
-    }
-  
-    if (!user) {
-      return (
-        <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
-          <p>Please log in to access the dashboard</p>
-        </div>
-      );
-    }
 
 
 const toggleResponderStatus = async () => {
@@ -115,6 +99,7 @@ const toggleResponderStatus = async () => {
       });
   
       setEmergencyRequests(filteredRequests);
+      console.log("✅ Fetched emergency requests:", filteredRequests);
     } catch (error) {
       console.error("❌ Failed to fetch emergency requests:", error);
     }
@@ -263,7 +248,7 @@ const toggleResponderStatus = async () => {
   /** ✅ WebSocket Connection */
   useEffect(() => {
     const connectWebSocket = () => {
-      const ws = new WebSocket("ws://localhost:8080");
+      const ws = new WebSocket("ws://localhost:8081");
   
       ws.onopen = () => {
         console.log("Connected to WebSocket");
@@ -306,7 +291,21 @@ const toggleResponderStatus = async () => {
     };
   }, []);
   
+  if (isUserLoading) {
+    return (
+      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
+        <p>Loading...</p>
+      </div>
+    );
+  }
 
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
+        <p>Please log in to access the dashboard</p>
+      </div>
+    );
+  }
   
 
   return (
