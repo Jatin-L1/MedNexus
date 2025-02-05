@@ -1,6 +1,6 @@
 "use client";
-import React, { useState ,useEffect} from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import {
   MapPin,
   AlertTriangle,
@@ -10,25 +10,23 @@ import {
   ShieldCheck,
   UserCircle,
   Clock,
-} from 'lucide-react';
-import EmergencyChat from '../../components/EmergencyChat';
-import axios from 'axios';
+} from "lucide-react";
+import EmergencyChat from "../../components/EmergencyChat";
+import axios from "axios";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { Polyline } from "react-leaflet";
 import L from "leaflet";
-import 'leaflet/dist/leaflet.css';
-
+import "leaflet/dist/leaflet.css";
 
 const patientIcon = new L.Icon({
-    iconUrl: "https://cdn-icons-png.flaticon.com/512/235/235861.png",
-    iconSize: [40, 40],
-  });
-  
-  const doctorIcon = new L.Icon({
-    iconUrl: "https://cdn-icons-png.flaticon.com/512/387/387561.png",
-    iconSize: [35, 35],
-  });
-  
+  iconUrl: "https://cdn-icons-png.flaticon.com/512/235/235861.png",
+  iconSize: [40, 40],
+});
+
+const doctorIcon = new L.Icon({
+  iconUrl: "https://cdn-icons-png.flaticon.com/512/387/387561.png",
+  iconSize: [35, 35],
+});
 
 const PatientEmergencyDashboard = () => {
   const [isEmergencyTriggered, setIsEmergencyTriggered] = useState(false);
@@ -51,7 +49,9 @@ const PatientEmergencyDashboard = () => {
     // Fetch accepted emergencies from the API
     const fetchAcceptedEmergencies = async () => {
       try {
-        const response = await axios.get("http://localhost:3004/api/emergency/accepted");
+        const response = await axios.get(
+          "http://localhost:3004/api/emergency/accepted"
+        );
         setAcceptedEmergencies(response.data);
         console.log("Accepted emergencies:", response.data);
       } catch (error) {
@@ -86,7 +86,6 @@ const PatientEmergencyDashboard = () => {
       return;
     }
 
-
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const location = {
@@ -106,7 +105,10 @@ const PatientEmergencyDashboard = () => {
           setSeveritySelected(true); // Mark severity as selected
           setIsEmergencyTriggered(true); // Mark emergency as triggered
         } catch (error) {
-          console.error("Error triggering emergency:", error.response ? error.response.data : error.message);
+          console.error(
+            "Error triggering emergency:",
+            error.response ? error.response.data : error.message
+          );
           alert("Failed to trigger emergency.");
         } finally {
           setLoading(false);
@@ -125,7 +127,8 @@ const PatientEmergencyDashboard = () => {
   };
 
   // Ensure there is at least one accepted emergency before rendering the map
-  const firstEmergency = acceptedEmergencies.length > 0 ? acceptedEmergencies[0] : null;
+  const firstEmergency =
+    acceptedEmergencies.length > 0 ? acceptedEmergencies[0] : null;
 
   const getRoute = async (patientLocation, responderLocation) => {
     try {
@@ -136,10 +139,9 @@ const PatientEmergencyDashboard = () => {
         },
       });
 
-      const coordinates = response.data.routes[0].geometry.coordinates.map((coord) => [
-        coord[1],
-        coord[0],
-      ]);
+      const coordinates = response.data.routes[0].geometry.coordinates.map(
+        (coord) => [coord[1], coord[0]]
+      );
       setRouteCoords(coordinates);
     } catch (error) {
       console.error("Error fetching route:", error);
@@ -150,62 +152,70 @@ const PatientEmergencyDashboard = () => {
     if (acceptedEmergencies.length > 0) {
       const firstEmergency = acceptedEmergencies[0];
       if (firstEmergency.patientLocation && firstEmergency.responderLocation) {
-        getRoute(firstEmergency.patientLocation, firstEmergency.responderLocation);
+        getRoute(
+          firstEmergency.patientLocation,
+          firstEmergency.responderLocation
+        );
       }
     }
   }, [acceptedEmergencies]);
 
-
   // Function to calculate distance using the Haversine formula
-function calculateDistance(lat1, lon1, lat2, lon2) {
+  function calculateDistance(lat1, lon1, lat2, lon2) {
     const R = 6371; // Earth's radius in km
     const dLat = (lat2 - lat1) * (Math.PI / 180);
     const dLon = (lon2 - lon1) * (Math.PI / 180);
-  
-    const a = 
+
+    const a =
       Math.sin(dLat / 2) ** 2 +
       Math.cos(lat1 * (Math.PI / 180)) *
-      Math.cos(lat2 * (Math.PI / 180)) *
-      Math.sin(dLon / 2) ** 2;
-  
+        Math.cos(lat2 * (Math.PI / 180)) *
+        Math.sin(dLon / 2) ** 2;
+
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     const distance = R * c; // Distance in km
-  
+
     return distance;
   }
-  
+
   // Function to calculate time based on distance
-  function calculateEstimatedTime (patientLocation, responderLocation, speed = 60) { // Speed in km/h
+  function calculateEstimatedTime(
+    patientLocation,
+    responderLocation,
+    speed = 60
+  ) {
+    // Speed in km/h
     if (!patientLocation || !responderLocation) return "Location data missing";
-  console.log(patientLocation, responderLocation);
+    console.log(patientLocation, responderLocation);
     const distance = calculateDistance(
       patientLocation.lat,
       patientLocation.lng,
       responderLocation.lat,
       responderLocation.lng
     );
-  
+
     const timeInHours = distance / speed;
     const timeInMinutes = Math.round(timeInHours * 60); // Convert to minutes
-  
+
     return `${timeInMinutes} mins`;
   }
-  
+
   // Severity color mapping
   const severityColors = {
     normal: {
-      default: 'bg-green-800/50 text-green-400',
-      active: 'bg-green-500 text-white'
+      default: "bg-green-800/50 text-green-400",
+      active: "bg-green-500 text-white",
     },
     moderate: {
-      default: 'bg-yellow-800/50 text-yellow-400',
-      active: 'bg-yellow-500 text-white'
+      default: "bg-yellow-800/50 text-yellow-400",
+      active: "bg-yellow-500 text-white",
     },
     critical: {
-      default: 'bg-red-800/50 text-red-400',
-      active: 'bg-red-500 text-white'
-    }
+      default: "bg-red-800/50 text-red-400",
+      active: "bg-red-500 text-white",
+    },
   };
+
 
 
   
@@ -229,10 +239,8 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col">
       {/* Navbar */}
-      <div className="w-full bg-black/30 backdrop-blur-md border-b border-gray-800 p-4 text-center text-lg font-bold">
-        
-      </div>
-      
+      <div className="w-full bg-black/30 backdrop-blur-md border-b border-gray-800 p-4 text-center text-lg font-bold"></div>
+
       <div className="flex flex-1 overflow-hidden mt-[1vh]">
         {/* Sidebar */}
         <div className="w-96 bg-black/30 backdrop-blur-md border-r border-gray-800 p-6 overflow-y-auto mt-7">
@@ -244,8 +252,8 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
                 <motion.button
                   key={level}
                   className={`w-full py-3 rounded-lg flex items-center justify-center space-x-2 ${
-                    emergencySeverity === level 
-                      ? severityColors[level].active 
+                    emergencySeverity === level
+                      ? severityColors[level].active
                       : severityColors[level].default
                   }`}
                   whileHover={{ scale: 1.05 }}
@@ -270,44 +278,63 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
               animate={{ opacity: 1, y: 0 }}
               className="bg-gray-800/50 rounded-lg p-4 border border-gray-700"
             >
-            {acceptedEmergencies.map((emergency) => (
-  <div key={emergency._id}> {/* Wrap everything in a div with the key */}
-    <div className="flex justify-between items-center mb-2">
-      <div className="flex items-center space-x-2">
-        <UserCircle className="w-10 h-10 text-gray-400" />
-        <div>
-          <h3 className="font-semibold text-lg">
-            {emergency.responderId?.name || "Responder Not Assigned"}
-          </h3>
-          <p className="text-sm text-gray-400">
-            {emergency.responderId?.role || "N/A"}
-          </p>
-        </div>
-      </div>
-      <span className="text-sm text-yellow-400">★</span>
-    </div>
-
-    <div className="space-y-2 text-sm text-gray-300 mt-3">
-      <div className="flex items-center space-x-2">
-        <MapPin className="w-4 h-4" />
-        <span> {calculateDistance(emergency.patientLocation.lat,emergency.patientLocation.lng,emergency.responderLocation.lat,emergency.responderLocation.lng)}km away</span>
-      </div>
-      <div className="flex items-center space-x-2">
-        <Clock className="w-4 h-4" />
-        <span>Estimated Arrival:  {calculateEstimatedTime(emergency.patientLocation, emergency.responderLocation)}</span>
-      </div>
-      <div className="flex items-center space-x-2">
-        <ShieldCheck className="w-4 h-4" />
-        <span>LicenseNumber : {emergency.responderId?.licenseNo || "N/A"}</span>
-      </div>
-    </div>
-  </div>
-))}
-
+              {acceptedEmergencies.map((emergency) => (
+                <div key={emergency._id}>
+                  {" "}
+                  {/* Wrap everything in a div with the key */}
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="flex items-center space-x-2">
+                      <UserCircle className="w-10 h-10 text-gray-400" />
+                      <div>
+                        <h3 className="font-semibold text-lg">
+                          {emergency.responderId?.name ||
+                            "Responder Not Assigned"}
+                        </h3>
+                        <p className="text-sm text-gray-400">
+                          {emergency.responderId?.role || "N/A"}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-sm text-yellow-400">★</span>
+                  </div>
+                  <div className="space-y-2 text-sm text-gray-300 mt-3">
+                    <div className="flex items-center space-x-2">
+                      <MapPin className="w-4 h-4" />
+                      <span>
+                        {" "}
+                        {calculateDistance(
+                          emergency.patientLocation.lat,
+                          emergency.patientLocation.lng,
+                          emergency.responderLocation.lat,
+                          emergency.responderLocation.lng
+                        )}
+                        km away
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Clock className="w-4 h-4" />
+                      <span>
+                        Estimated Arrival:{" "}
+                        {calculateEstimatedTime(
+                          emergency.patientLocation,
+                          emergency.responderLocation
+                        )}
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <ShieldCheck className="w-4 h-4" />
+                      <span>
+                        LicenseNumber :{" "}
+                        {emergency.responderId?.licenseNo || "N/A"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </motion.div>
           </div>
         </div>
-    
+
         {/* Main Content */}
         <div className="flex-1 bg-gray-900 p-3 relative overflow-auto">
           <div className="bg-black/30 backdrop-blur-md border border-gray-800 rounded-lg h-full p-4 flex flex-col relative mt-4">
@@ -320,35 +347,52 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
                 <MessageCircle className="w-6 h-6" />
               </button>
             </div>
-            
+
             <div className="bg-gray-800/50 rounded-lg h-[calc(100%-4rem)] flex items-center justify-center">
-             <div className='flex-1 p-6 overflow-y-auto'>
-      {firstEmergency && firstEmergency.patientLocation && (
-        <MapContainer
-          center={[firstEmergency.patientLocation.lat, firstEmergency.patientLocation.lng]}
-          zoom={20}
-          style={{ height: "500px", width: "100%" }}
-        >
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          />
+              <div className="flex-1 p-6 overflow-y-auto">
+                {firstEmergency && firstEmergency.patientLocation && (
+                  <MapContainer
+                    center={[
+                      firstEmergency.patientLocation.lat,
+                      firstEmergency.patientLocation.lng,
+                    ]}
+                    zoom={20}
+                    style={{ height: "500px", width: "100%" }}
+                  >
+                    <TileLayer
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                    />
 
-          {/* Patient's Marker */}
-          <Marker position={[firstEmergency.patientLocation.lat, firstEmergency.patientLocation.lng]} icon={patientIcon}>
-            <Popup>Your Location</Popup>
-          </Marker>
+                    {/* Patient's Marker */}
+                    <Marker
+                      position={[
+                        firstEmergency.patientLocation.lat,
+                        firstEmergency.patientLocation.lng,
+                      ]}
+                      icon={patientIcon}
+                    >
+                      <Popup>Your Location</Popup>
+                    </Marker>
 
-          {/* Doctor's Live Location Marker */}
-          {firstEmergency.responderLocation && (
-            <Marker position={[firstEmergency.responderLocation.lat, firstEmergency.responderLocation.lng]} icon={doctorIcon}>
-              <Popup>Doctor is on the way!</Popup>
-            </Marker>
-          )}
-          {routeCoords.length > 0 && <Polyline positions={routeCoords} color="blue" />}
-        </MapContainer>
-      )}
-</div>
+                    {/* Doctor's Live Location Marker */}
+                    {firstEmergency.responderLocation && (
+                      <Marker
+                        position={[
+                          firstEmergency.responderLocation.lat,
+                          firstEmergency.responderLocation.lng,
+                        ]}
+                        icon={doctorIcon}
+                      >
+                        <Popup>Doctor is on the way!</Popup>
+                      </Marker>
+                    )}
+                    {routeCoords.length > 0 && (
+                      <Polyline positions={routeCoords} color="blue" />
+                    )}
+                  </MapContainer>
+                )}
+              </div>
             </div>
 
             <div className="flex space-x-4 mt-auto">
@@ -360,9 +404,15 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
                 disabled={!emergencySeverity || isEmergencyTriggered}
               >
                 <Ambulance className="w-6 h-6" />
-                <span>{isEmergencyTriggered ? "Emergency Triggered" : "Trigger Emergency"}</span>
+                <span>
+                  {isEmergencyTriggered
+                    ? "Emergency Triggered"
+                    : "Trigger Emergency"}
+                </span>
               </motion.button>
+
               {acceptedEmergencies.map((emergency) => (
+
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -371,14 +421,23 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
                
               >
                 <CheckCircle2 className="w-6 h-6" />
-                <span>{isDoctorArrived ? "Doctor Arrived" : "Confirm Doctor Arrival"}</span>
+                <span>
+                  {isDoctorArrived
+                    ? "Doctor Arrived"
+                    : "Confirm Doctor Arrival"}
+                </span>
               </motion.button>
               ))}
             </div>
           </div>
         </div>
       </div>
-      {isChatOpen && <EmergencyChat />}
+      {isChatOpen && acceptedEmergencies.length > 0 && (
+        <EmergencyChat
+          emergencyId={acceptedEmergencies[0]._id}
+          userId={user.id}
+        />
+      )}
     </div>
   );
 };
