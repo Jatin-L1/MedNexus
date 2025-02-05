@@ -1,13 +1,15 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Brain, Activity, Hospital, AlertCircle, KeyRound, ChevronDown } from 'lucide-react';
+import { Brain, Activity, Hospital, AlertCircle, KeyRound, ChevronDown, LogOut } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function Navbar() {
   const [navBackground, setNavBackground] = useState('transparent');
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -17,6 +19,12 @@ export default function Navbar() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const handleSignOut = () => {
+    localStorage.removeItem('session'); // Replace 'session' with your session key in localStorage
+    setDropdownOpen(false); // Close the dropdown
+    router.push('/login'); // Redirect to the login page
+  };
 
   return (
     <motion.nav
@@ -37,7 +45,7 @@ export default function Navbar() {
           </motion.div>
 
           <div className="hidden md:flex space-x-8">
-            {[
+            {[ 
               { name: 'Disease Prediction', icon: Brain, href: '/predict' },
               { name: 'AI Assistance', icon: Activity, href: '/ai' },
               { name: 'Find a Hospital', icon: Hospital, href: '/hospital' },
@@ -96,6 +104,13 @@ export default function Navbar() {
                   >
                     Register as Patient
                   </Link>
+                  <button
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white"
+                    onClick={handleSignOut}
+                  >
+                    <LogOut className="inline w-4 h-4 mr-2" />
+                    Sign Out
+                  </button>
                 </motion.div>
               )}
             </div>
