@@ -346,6 +346,8 @@ const toggleResponderStatus = async () => {
             <div className="space-y-2 text-gray-300">
               <p>{user.name}</p>
               <p>{user.specialisation}</p>
+              <p>Years of Experience: {user.yearsOfExperience}</p>
+              <p>License Number:{user.licenseNo}</p>
               <div className="flex space-x-4 mt-4">
                 <div className="bg-gray-800/50 rounded-lg p-3 flex-1 text-center">
                   <p className="text-sm text-gray-400">Today&apos;s Patients</p>

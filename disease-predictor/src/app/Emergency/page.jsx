@@ -284,7 +284,7 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
       </div>
       <div className="flex items-center space-x-2">
         <ShieldCheck className="w-4 h-4" />
-        <span>LicenseNumber : {acceptedEmergencies.responderId?.licenseNo || "N/A"}</span>
+        <span>LicenseNumber : {emergency.responderId?.licenseNo || "N/A"}</span>
       </div>
     </div>
   </div>
