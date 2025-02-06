@@ -28,9 +28,9 @@ export default function PatientRegisterForm() {
     setLoading(true);
 
     const payload = {
-      ...credentials,
-      role: "patient",
-    specialization: "",
+     ...credentials,
+    role: "patient",
+    specialisation: "",
     licenseNo: "",
     yearsOfExperience: "",
     coverImage: "",
