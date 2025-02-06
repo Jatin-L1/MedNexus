@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react"
 import { flushSync } from "react-dom"
 import { Send, Brain, UserRound, MessageCircle, X } from "lucide-react"
+import { useAiChatData } from "@/context/aiChatContext"
 
 function ConversationDisplayArea({ data, streamdiv, answer }) {
   const messagesEndRef = useRef(null)
@@ -75,7 +76,7 @@ export default function FloatingChat() {
   const inputRef = useRef()
   const host = "http://localhost:3004/api/ai"
   const streamUrl = `${host}/stream`
-  const [data, setData] = useState([])
+  const { data, setData } = useAiChatData();
   const [answer, setAnswer] = useState("")
   const [streamdiv, showStreamdiv] = useState(false)
   const [waiting, setWaiting] = useState(false)
