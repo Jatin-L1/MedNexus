@@ -75,6 +75,7 @@ initChatWebSocket(server);
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/emergency", require("./routes/emergencyRoutes"));
 app.use("/api/chat", require("./routes/chatRoutes")); // New chat routes
+app.use("/api/ai", require("./routes/geminiRoutes"));
 
 app.get("/api/directions", async (req, res) => {
     const { start, end } = req.query;
