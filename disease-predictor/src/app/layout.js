@@ -1,6 +1,8 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/NavBar";
+import { AiChatDataProvider } from "@/context/aiChatContext";
+import FloatingChat from "@/components/FloatingChat";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,6 +27,9 @@ export default function RootLayout({ children }) {
       >
         <Navbar />
         {children}
+        <AiChatDataProvider>
+          <FloatingChat />
+        </AiChatDataProvider>
       </body>
     </html>
   );
