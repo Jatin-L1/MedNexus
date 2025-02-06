@@ -78,7 +78,7 @@ exports.getAcceptedEmergencies = async (req, res) => {
       // Fetch all accepted emergencies and populate the doctor and patient data
       const acceptedEmergencies = await Emergency.find({ status: 'inProgress' })
         .populate('patientId', 'name location')  // Populate patient data (name, location)
-        .populate('responderId', 'name location role licenseNo'); // Populate doctor data (name, location)
+        .populate('responderId', 'name location role licenseNo coverImage'); // Populate doctor data (name, location)
   
       if (!acceptedEmergencies || acceptedEmergencies.length === 0) {
         return res.status(404).json({ error: "No accepted emergencies found" });

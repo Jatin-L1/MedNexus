@@ -20,25 +20,7 @@ exports.register = async (req, res) => {
       coverImage 
     } = req.body;
 
-    // Comprehensive input validation
-    const requiredFields = [
-      { name: 'Name', value: name },
-      { name: 'Email', value: email },
-      { name: 'Password', value: password },
-      { name: 'Role', value: role },
-      { name: 'License Number', value: licenseNo }
-    ];
-
-    const missingFields = requiredFields
-      .filter(field => !field.value)
-      .map(field => field.name);
-
-    if (missingFields.length > 0) {
-      return res.status(400).json({ 
-        error: `Missing required fields: ${missingFields.join(', ')}` 
-      });
-    }
-
+   
     // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
