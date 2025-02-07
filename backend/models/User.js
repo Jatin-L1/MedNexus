@@ -10,7 +10,15 @@ const userSchema = new mongoose.Schema({
   licenseNo:{type:String}, // Only applies to doctors
   yearsOfExperience:{type:Number}, // Only applies to doctors
   coverImage: { type: String, default: "" }, // To store the image URL
-  coverImagePublicId: { type: String, default: "" } // To store the Cloudinary public ID
+  coverImagePublicId: { type: String, default: "" }, // To store the Cloudinary public ID
+  
+  // * For verification of professional in dashboard
+  // * nil is for normal user, rest for professionals
+  isVerifiedDoctor: {
+    type: String,
+    enum: ["pending", "rejected", "approved", "nil"],
+    default: "nil"
+  }
 });
 
 module.exports = mongoose.model("User", userSchema);
