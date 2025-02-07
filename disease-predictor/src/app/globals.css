@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -13,11 +14,15 @@
     --foreground: #ededed;
   }
 }
-
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Montserrat, sans-serif;
+}
+.tagline{
+  font-family: anton, sans-serif;
+}
+
+.sign{
+  font-family: Montserrat,sans-serif;
 }
 
 .radar-wave {
@@ -49,3 +54,75 @@ body {
     opacity: 0;
   }
 }
+
+.juice {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+}
+.hospital-page .juice {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+}
+
+
+.juice img {
+  animation: float 4s ease-in-out infinite;
+  max-height: 700px;
+}
+
+.hospital-page .juice img {
+  animation: float 4s ease-in-out infinite;
+  max-height: 600px;
+}
+
+@keyframes float {
+  0% {
+    transform: translate(-50%, -46%);
+  }
+  50% {
+    transform: translate(-50%, -54%);
+  }
+  100% {
+    transform: translate(-50%, -46%);
+  }
+}
+
+#scene {
+  position: relative !important; /* Ensure this parent has relative positioning */
+  width: 100% !important; /* Ensure it covers the area */
+  height: 100% !important; /* Ensure it covers the area */
+}
+
+.leaves .layer {
+  position: absolute !important; /* Layers need absolute positioning within the parent container */
+}
+
+.leaves .layer:nth-child(1) {
+  top: 250px !important;
+  left: 250px !important;
+}
+
+.leaves .layer:nth-child(2) {
+  top: 340px !important;
+  left: 900px !important;
+}
+
+.leaves .layer:nth-child(3) {
+  top: 440px !important;
+  left: 470px !important;
+}
+
+.leaves .layer:nth-child(4) {
+  top: 40px !important;
+  left: 800px !important;
+}
+
+.leaves .layer:nth-child(5) {
+  top: 300px !important;
+  left: 1040px !important;
+}
+
