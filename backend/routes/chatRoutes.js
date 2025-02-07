@@ -1,16 +1,34 @@
-const express = require('express');
-const router = express.Router();
-const { ChatMessage } = require('../websocket-chat');
+const router = require('express').Router();
+const ChatMessage = require('../models/ChatMessage');
 
-// Get chat messages for a specific emergency
-router.get('/messages/:emergencyId', async (req, res) => {
+// Send a message
+router.post('/send', async (req, res) => {
+  const { emergencyId, senderId, senderModel, message, timestamp } = req.body;
+
   try {
-    const messages = await ChatMessage.find({ 
-      emergencyId: req.params.emergencyId 
-    }).sort({ timestamp: 1 });
-    res.json(messages);
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching chat messages' });
+    const newMessage = new ChatMessage({ 
+      emergencyId, 
+      senderId, 
+      senderModel, 
+      message, 
+      timestamp 
+    });
+    await newMessage.save();
+    res.status(200).json(newMessage);
+  } catch (err) {
+    res.status(400).json({ error: 'Error sending message' });
+  }
+});
+
+// Get messages for a specific emergency
+router.get('/:emergencyId', async (req, res) => {
+  const { emergencyId } = req.params;
+
+  try {
+    const messages = await ChatMessage.find({ emergencyId }).sort({ timestamp: 1 });
+    res.status(200).json(messages);
+  } catch (err) {
+    res.status(400).json({ error: 'Error fetching messages' });
   }
 });
 

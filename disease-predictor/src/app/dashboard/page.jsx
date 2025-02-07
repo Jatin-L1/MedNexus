@@ -20,7 +20,7 @@ import {
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import axios from "axios";
-import { ChatDialog } from "@/components/chat-dialog";
+import EmergencyChat from "@/components/EmergencyChat";
 
 // Custom Icons
 const blueIcon = new L.Icon({
@@ -207,6 +207,20 @@ const DoctorDashboard = () => {
     }
   };
 
+  const [selectedEmergency, setSelectedEmergency] = useState(null);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [messages, setMessages] = useState([]);
+
+  // Add message fetching function
+  const fetchMessages = async (emergencyId) => {
+    try {
+      const response = await axios.get(`http://localhost:3004/api/messages/${emergencyId}`);
+      setMessages(response.data);
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+    }
+  };
+
   /** ✅ Accept Emergency */
   const acceptEmergency = async (emergencyId, patientId, patientLocation) => {
     if (!user?.id) {
@@ -228,12 +242,18 @@ const DoctorDashboard = () => {
         responderLocation,
       });
 
+      const emergency = emergencyRequests.find(e => e._id === emergencyId);
+      setSelectedEmergency(emergency);
+      setIsChatOpen(true); // Open chat when emergency is accepted
+      fetchMessages(emergencyId); // Fetch messages for this emergency
+
       alert("Emergency accepted!");
       fetchEmergencyRequests(); // Re-fetch after accepting
     } catch (error) {
       console.error("❌ Error accepting emergency:", error);
     }
   };
+  
 
   function convertTo12HourFormat(isoString) {
     const date = new Date(isoString);
@@ -323,12 +343,24 @@ const DoctorDashboard = () => {
 
     connectWebSocket();
 
+    
+
     return () => {
       if (socket) {
         socket.close();
       }
     };
   }, []);
+  useEffect(() => {
+    if (selectedEmergency && socket) {
+      socket.onmessage = (event) => {
+        const newMessage = JSON.parse(event.data);
+        if (newMessage.emergencyId === selectedEmergency._id) {
+          setMessages(prev => [...prev, newMessage]);
+        }
+      };
+    }
+  }, [selectedEmergency, socket]);
 
   if (isUserLoading) {
     return (
@@ -345,6 +377,7 @@ const DoctorDashboard = () => {
       </div>
     );
   }
+ 
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
@@ -432,10 +465,6 @@ const DoctorDashboard = () => {
                         {emergency.severity}
                       </span>
                     </div>
-                    <ChatDialog 
-  emergencyId={emergency._id} 
-  userId={user.id} 
-/>
                     <div className="flex items-center text-gray-400 text-sm mb-3">
                       <MapPin className="w-4 h-4 mr-1" />
                       {emergency.status}
@@ -492,7 +521,6 @@ const DoctorDashboard = () => {
                   whileTap={{ scale: 0.95 }}
                   className="p-2 bg-gray-800/50 rounded-lg"
                 >
-                  <ChatDialog />
                 </motion.button>
               </div>
             </div>
@@ -549,6 +577,12 @@ const DoctorDashboard = () => {
           </div>
         </div>
       </div>
+      {selectedEmergency && (
+        <EmergencyChat 
+          emergencyId={selectedEmergency._id}
+          userId={user.id}
+        />
+      )}
     </div>
   );
 };

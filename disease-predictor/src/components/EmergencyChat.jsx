@@ -1,123 +1,183 @@
-"use client"
-import React, { useState, useEffect, useRef } from 'react';
-import { Send, MessageCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+"use client";
+import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
+import { Send, X, MessageCircle, Loader2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const EmergencyChat = ({ emergencyId, userId }) => {
   const [messages, setMessages] = useState([]);
-  const [inputMessage, setInputMessage] = useState("");
+  const [newMessage, setNewMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isMinimized, setIsMinimized] = useState(false);
   const [socket, setSocket] = useState(null);
   const messagesEndRef = useRef(null);
 
-  useEffect(() => {
-    // Establish WebSocket connection
-    const ws = new WebSocket(`ws://localhost:3004?emergencyId=${emergencyId}&userId=${userId}`);
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
+  useEffect(() => {
+    // Initialize WebSocket
+    const ws = new WebSocket("ws://localhost:8081");
+    
     ws.onopen = () => {
-      console.log('WebSocket Chat Connection Established');
+      console.log("WebSocket Connected");
       setSocket(ws);
     };
 
     ws.onmessage = (event) => {
-      const receivedMessage = JSON.parse(event.data);
-      setMessages(prevMessages => [...prevMessages, receivedMessage]);
-    };
-
-    ws.onerror = (error) => {
-      console.error('WebSocket Chat Error:', error);
-    };
-
-    ws.onclose = () => {
-      console.log('WebSocket Chat Disconnected');
-    };
-
-    // Fetch previous messages
-    const fetchPreviousMessages = async () => {
-      try {
-        const response = await fetch(`http://localhost:3004/api/chat/messages/${emergencyId}`);
-        const previousMessages = await response.json();
-        setMessages(previousMessages);
-      } catch (error) {
-        console.error('Error fetching previous messages:', error);
+      const data = JSON.parse(event.data);
+      if (data.data?.emergencyId === emergencyId) {
+        setMessages(prev => [...prev, data.data]);
+        scrollToBottom();
       }
     };
 
-    fetchPreviousMessages();
+    // Fetch existing messages
+    const fetchMessages = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:3004/api/chat/${emergencyId}`
+        );
+        setMessages(response.data);
+        setIsLoading(false);
+        scrollToBottom();
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+        setIsLoading(false);
+      }
+    };
+
+    fetchMessages();
 
     return () => {
-      ws.close();
+      if (ws) ws.close();
     };
-  }, [emergencyId, userId]);
+  }, [emergencyId]);
 
-  useEffect(() => {
-    // Scroll to bottom when messages change
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  const sendMessage = async () => {
+    if (!newMessage.trim()) return;
 
-  const handleSendMessage = () => {
-    if (inputMessage.trim() !== "" && socket) {
-      const messageData = {
-        senderId: userId,
-        senderType: 'patient', // or 'doctor' based on user role
-        message: inputMessage
-      };
+    const messageData = {
+      emergencyId,
+      senderId: userId,
+      senderModel: userId.startsWith("DOC") ? "Doctor" : "Patient",
+      message: newMessage.trim(),
+      timestamp: new Date()
+    };
 
-      socket.send(JSON.stringify(messageData));
-      setInputMessage("");
+    try {
+      // Send via REST API
+      await axios.post("http://localhost:3004/api/chat/send", messageData);
+      
+      // Send via WebSocket
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify(messageData));
+      }
+
+      setNewMessage("");
+      scrollToBottom();
+    } catch (error) {
+      console.error("Error sending message:", error);
     }
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
-      handleSendMessage();
-    }
+  const formatTime = (timestamp) => {
+    return new Date(timestamp).toLocaleTimeString([], { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
   };
 
   return (
-    <div className="fixed bottom-4 right-4 w-96 bg-gray-800 rounded-lg shadow-lg">
-      <div className="p-4 bg-gray-700 rounded-t-lg flex justify-between items-center">
-        <h3 className="font-bold">Emergency Chat</h3>
-      </div>
-      
-      <div className="h-96 overflow-y-auto p-4 space-y-3">
-        {messages.map((msg, index) => (
-          <div 
-            key={index} 
-            className={`flex flex-col ${
-              msg.senderType === 'doctor' ? 'items-start' : 'items-end'
-            }`}
-          >
-            <div 
-              className={`rounded-lg px-4 py-2 max-w-[80%] ${
-                msg.senderType === 'doctor' 
-                  ? 'bg-blue-800 text-white' 
-                  : 'bg-blue-600 text-white'
-              }`}
-            >
-              <p>{msg.message}</p>
-              <p className="text-xs text-blue-200 mt-1">
-                {new Date(msg.timestamp).toLocaleTimeString()}
-              </p>
-            </div>
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 50 }}
+        className={`fixed ${
+          isMinimized ? "bottom-4 right-4 w-auto" : "bottom-4 right-4 w-96"
+        } bg-gray-800 rounded-lg shadow-xl border border-gray-700`}
+      >
+        {/* Chat Header */}
+        <div className="p-4 bg-gray-900 rounded-t-lg flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <MessageCircle className="text-blue-400" />
+            <h3 className="font-bold text-white">Emergency Chat</h3>
           </div>
-        ))}
-        <div ref={messagesEndRef} />
-      </div>
-      
-      <div className="p-4 border-t border-gray-700 flex items-center space-x-2">
-        <Input
-          placeholder="Type your message..."
-          className="flex-1"
-          value={inputMessage}
-          onChange={(e) => setInputMessage(e.target.value)}
-          onKeyPress={handleKeyPress}
-        />
-        <Button size="icon" onClick={handleSendMessage}>
-          <Send className="h-4 w-4" />
-        </Button>
-      </div>
-    </div>
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => setIsMinimized(!isMinimized)}
+              className="text-gray-400 hover:text-white"
+            >
+              {isMinimized ? (
+                <MessageCircle className="w-5 h-5" />
+              ) : (
+                <X className="w-5 h-5" />
+              )}
+            </button>
+          </div>
+        </div>
+
+        {!isMinimized && (
+          <>
+            {/* Chat Messages */}
+            <div className="h-96 overflow-y-auto p-4 space-y-4">
+              {isLoading ? (
+                <div className="flex justify-center items-center h-full">
+                  <Loader2 className="w-8 h-8 animate-spin text-blue-400" />
+                </div>
+              ) : (
+                messages.map((msg, index) => (
+                  <div
+                    key={index}
+                    className={`flex ${
+                      msg.senderId === userId ? "justify-end" : "justify-start"
+                    }`}
+                  >
+                    <div
+                      className={`max-w-[70%] ${
+                        msg.senderId === userId
+                          ? "bg-blue-600 text-white"
+                          : "bg-gray-700 text-gray-200"
+                      } rounded-lg p-3 space-y-1`}
+                    >
+                      <p className="text-sm">{msg.message}</p>
+                      <p className="text-xs opacity-75 text-right">
+                        {formatTime(msg.timestamp)}
+                      </p>
+                    </div>
+                  </div>
+                ))
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+
+            {/* Message Input */}
+            <div className="p-4 border-t border-gray-700">
+              <div className="flex space-x-2">
+                <input
+                  type="text"
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && sendMessage()}
+                  placeholder="Type your message..."
+                  className="flex-1 bg-gray-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={sendMessage}
+                  className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <Send className="w-5 h-5" />
+                </motion.button>
+              </div>
+            </div>
+          </>
+        )}
+      </motion.div>
+    </AnimatePresence>
   );
 };
 

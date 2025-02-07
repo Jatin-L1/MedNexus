@@ -432,6 +432,7 @@ const PatientEmergencyDashboard = () => {
           </div>
         </div>
       </div>
+      {/* Add EmergencyChat component here */}
       {isChatOpen && acceptedEmergencies.length > 0 && (
         <EmergencyChat
           emergencyId={acceptedEmergencies[0]._id}
