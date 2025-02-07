@@ -1,4 +1,5 @@
 "use client"; // Ensure this component is treated as client-side
+
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { UserCog, Lock, LogIn } from 'lucide-react';
