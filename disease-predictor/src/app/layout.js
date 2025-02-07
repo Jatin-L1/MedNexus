@@ -1,6 +1,19 @@
 import "./globals.css";
 import Navbar from "@/components/NavBar";
 import { AnimateProvider } from '@/context/context';
+import { AiChatDataProvider } from "@/context/aiChatContext";
+import FloatingChat from "@/components/FloatingChat";
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
 
 export const metadata = {
   title: "MedNexus",
@@ -20,13 +33,16 @@ export default function RootLayout({ children }) {
           rel="stylesheet"
         />
       </head>
-      <body className="font-montserrat">
-        {/* Only one Navbar inside AnimateProvider */}
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased font-montserrat`}>
         <AnimateProvider>
           <Navbar />
           {children}
+          <AiChatDataProvider>
+            <FloatingChat />
+          </AiChatDataProvider>
         </AnimateProvider>
       </body>
     </html>
   );
 }
+
