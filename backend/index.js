@@ -77,6 +77,9 @@ app.use("/api/emergency", require("./routes/emergencyRoutes"));
 app.use("/api/chat", require("./routes/chatRoutes")); // New chat routes
 app.use("/api/ai", require("./routes/geminiRoutes"));
 
+// TODO: Add api to update the status of the user.
+app.use("/api/admin", require("./routes/adminRoutes"));
+
 app.get("/api/directions", async (req, res) => {
     const { start, end } = req.query;
     const API_KEY = process.env.MAPBOX_API_KEY;
@@ -100,5 +103,5 @@ app.get("/api/directions", async (req, res) => {
 // Start Server
 const PORT = process.env.PORT || 3004;
 server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on port http://localhost:${PORT}`);
 });

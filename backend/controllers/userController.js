@@ -40,6 +40,9 @@ exports.register = async (req, res) => {
       licenseNo,
       yearsOfExperience,
       coverImage: coverImage || '', // Use uploaded image URL or empty string
+
+      // ! For verification purpose in the dashboard
+      isVerifiedDoctor: ( role != "patient" ? "pending" : "nil" )
     });
 
     await newUser.save();
