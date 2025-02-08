@@ -63,6 +63,7 @@ const app = express();
 const server = http.createServer(app);
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 
 // Connect to MongoDB
@@ -79,6 +80,9 @@ app.use("/api/ai", require("./routes/geminiRoutes"));
 
 // TODO: Add api to update the status of the user.
 app.use("/api/admin", require("./routes/adminRoutes"));
+
+// TODO: Add api to update the ipfs upload.
+app.use("/api/users/upload", require("./routes/ipfsRoutes"));
 
 app.get("/api/directions", async (req, res) => {
     const { start, end } = req.query;
