@@ -1,91 +1,65 @@
-🩸 MedNexus – Connecting Patients & Donors in Real-Time
-(Add a relevant banner or logo if available)
 
-🚀 A Life-Saving Platform for Seamless Blood Donations
-MedNexus is a real-time blood donation platform that connects patients in need with nearby donors efficiently. Our mission is to eliminate delays, enhance accessibility, and save lives through a smart, location-based matching system.
-
-🌟 Key Features
-✅ Instant Blood Requests – Patients can post emergency requests specifying blood type, urgency, and location.
-✅ Real-Time Donor Matching – The platform intelligently notifies nearby verified donors.
-✅ Secure Communication – Built-in chat system for seamless donor-patient coordination.
-✅ Hospital & NGO Integration – Enables hospitals & organizations to manage blood requests efficiently.
-✅ User Authentication & Verification – Ensures security & reliability by verifying users.
-
-🛠 Tech Stack
-Technology	Usage
-Frontend	React.js, Tailwind CSS, Bootstrap
-Backend	Node.js, Express.js
-Database	MongoDB Atlas
-Location Services	Leaflet API, Google Maps API
-Deployment	Vercel / Render
-Cloud Storage	Cloudinary
-🎯 Why PatientBridge?
-🚑 Critical Impact – Every second matters in medical emergencies.
-📍 Smart Matching – Finds donors based on location, urgency, and availability.
-💡 Scalable & Secure – Built with modern, scalable technology.
-🤝 Community-Driven – Encourages donation through gamification (badges & rewards).
-
-🔥 How It Works?
-📌 Step 1: Sign Up/Login – Register as a Donor or Patient.
-📌 Step 2: Post a Blood Request – Specify blood type, urgency, and location.
-📌 Step 3: Find a Donor – Get instant matches with nearby volunteers.
-📌 Step 4: Chat & Connect – Securely communicate to coordinate the donation.
-📌 Step 5: Save a Life! – Complete the donation and track its impact.
-
-📦 Setup & Installation
-🔹 Prerequisites
-✅ Node.js & npm installed
-✅ MongoDB setup (Atlas/local)
-
-🔹 Steps to Run Locally
-bash
-Copy
-Edit
+<body>
+    <h1 align="center">🚀 MedNexus: AI-Powered Medical Emergency & Disease Prediction Platform</h1>
+    
+    <p align="center">
+        <strong>A Space-Themed, Web3 Integrated Platform for Emergency Medical Response & AI-driven Disease Prediction.</strong>
+    </p>
+    
+    <h2>🌟 Project Overview</h2>
+    <p>MedNexus is an innovative AI-driven medical platform designed to provide <strong>emergency response services</strong>, <strong>real-time disease prediction</strong>, and a <strong>secure Web3 KYC verification system</strong>. It ensures rapid help in crises, enabling users to request professional assistance and predict illnesses through AI-powered analysis.</p>
+    
+    <h2>🛠 Tech Stack</h2>
+    <ul>
+        <li><strong>Frontend:</strong> React.js, TailwindCSS, Framer Motion (for animations)</li>
+        <li><strong>Backend:</strong> Node.js</li>
+        <li><strong>AI Integration:</strong> DeepSeek AI via Ollama API (for chatbot and disease prediction)</li>
+        <li><strong>Maps & Tracking:</strong> OpenStreetMap API (for real-time tracking)</li>
+        <li><strong>Database:</strong> MongoDBAtlas (for structured data storage)</li>
+    </ul>
+    
+    <h2>📌 Key Features</h2>
+    <ul>
+        <li><strong>🚑 Emergency Medical Response:</strong> Users can instantly request medical help, tracking responders in real-time.</li>
+        <li><strong>🔬 AI Disease Prediction:</strong> Users input symptoms, and AI suggests possible illnesses with recommended actions.</li>
+        <li><strong>💬 AI Chatbot for First Aid:</strong> Provides immediate first-aid guidance.</li>
+        <li><strong>🗺️ Live Tracking:</strong> Real-time location sharing of medical responders.</li>
+    </ul>
+    
+    <h2>📄 Pages & User Flow</h2>
+    <ul>
+        <li><strong>🏠 Home Page:</strong> Interactive space-themed landing page with an emergency distress button.</li>
+        <li><strong>🆘 Emergency Live Tracking:</strong> Displays real-time responder location & estimated arrival.</li>
+        <li><strong>🤖 AI Chatbot:</strong> Users can ask for first-aid advice and medical guidance.</li>
+        <li><strong>🩺 Disease Prediction:</strong> AI-based symptom analysis to suggest possible health conditions.</li>
+        <li><strong>📍 Find Nearby Hospitals:</strong> Uses OpenStreetMap to locate medical centers near the user.</li>
+    </ul>
+    
+    <h2>🎨 Space-Themed UI & UX</h2>
+    <p>The interface is designed with a futuristic <strong>space theme</strong>, using glowing neon elements, animated transitions, and smooth user interactions.</p>
+    
+    <h2>📂 Installation & Setup</h2>
+    <pre class="highlight">
 # Clone the repository
 git clone https://github.com/Jatin-L1/MedNexus.git
-
-# Navigate to project directory
-cd disease-pre
-
+cd disease-predictor
 # Install dependencies
-npm install
+npm install  # For React frontend
 
-# Start frontend
-npm run dev
-🔹 Backend Setup (Run in a separate terminal)
-bash
-Copy
-Edit
-cd backend
-npm install
+# Start the frontend
 npm start
-🔹 Environment Variables (Create a .env file in the root directory)
-env
-Copy
-Edit
-MONGO_URI=your_mongodb_uri
-PORT=3004
-SECRET_KEY=your_secret_key
-MAPBOX_API_KEY=your_mapbox_api_key
-GOOGLE_API_KEY=your_google_api_key
-CLOUDINARY_CLOUD_NAME=your_cloudinary_name
-CLOUDINARY_API_KEY=your_cloudinary_api_key
-CLOUDINARY_API_SECRET=your_cloudinary_api_secret
-📈 Future Roadmap
-🚀 Mobile App Development (React Native)
-🌎 Multi-Language Support
-📊 AI-Powered Blood Demand Prediction
-🩸 Gamification (Donor Badges & Rewards)
-🏥 Hospital & Blood Bank Collaboration
 
-🤝 Contributing
-We welcome contributions! Follow these steps to contribute:
+# Start the backend
+npm start
+    </pre>
+    
+    <h2>🚀 Future Enhancements</h2>
+    <ul>
+        <li>🔍 AI-powered Medical Image Analysis for diagnosis</li>
+        <li>📱 Mobile App Integration</li>
+        <li>🧠 NLP-based Doctor Consultation</li>
+    </ul>
 
-1️⃣ Fork the repository.
-2️⃣ Create a new branch (feature-xyz).
-3️⃣ Commit your changes (git commit -m "Added XYZ feature").
-4️⃣ Push the branch (git push origin feature-xyz).
-5️⃣ Open a Pull Request.
-
-❤️ Every Drop Counts. Be the Bridge, Save Lives!
-🚀 Star this repository if you like the project! ⭐
+    
+    <hr>
+    <p align="center">⭐ If you find this project interesting, don't forget to star the repo!</p>
