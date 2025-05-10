@@ -1,35 +1,70 @@
-
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, Bell, Moon, Sun, Phone, MessageCircle } from 'lucide-react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css';
 import axios from 'axios';
-import L from 'leaflet';
 
+// Dynamically import Leaflet components with no SSR
+const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
+const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
+const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false });
+const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false });
 
-// Component to handle map position updates
-function MapUpdater({ center }) {
-  const map = useMap();
-  useEffect(() => {
-    map.setView(center, 13);
-  }, [center, map]);
-  return null;
-}
+// Dynamically import useMap hook
+const MapUpdaterComponent = dynamic(() => import('react-leaflet').then(mod => {
+  // Component to handle map position updates
+  const MapUpdater = ({ center }) => {
+    const map = mod.useMap();
+    useEffect(() => {
+      map.setView(center, 13);
+    }, [center, map]);
+    return null;
+  };
+  return Promise.resolve(MapUpdater);
+}), { ssr: false });
 
 const DoctorDashboard = () => {
- 
   const [hospitals, setHospitals] = useState([]);
   const [mapCenter, setMapCenter] = useState([0, 0]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const API_KEY = "ca277f684e914ee8b72058fbc5134660";
+  
+  // Refs for Leaflet icons
+  const currentLocationIconRef = useRef(null);
+  const hospitalIconRef = useRef(null);
+  
+  // Create Leaflet icons on client-side only
+  useEffect(() => {
+    import('leaflet').then((L) => {
+      currentLocationIconRef.current = L.divIcon({
+        className: 'current-location-marker',
+        html: `
+          <div style="position: relative;">
+            <div class="radar-wave"></div>
+            <div class="w-4 h-4 bg-blue-500 rounded-full border-2 border-white relative z-10"></div>
+          </div>
+        `,
+      });
+      
+      hospitalIconRef.current = L.divIcon({
+        className: 'current-location-marker',
+        html: `
+          <div style="position: relative;">
+            <div class="radar-wave2"></div>
+            <div class="w-4 h-4 bg-red-500 rounded-full border-2 border-white relative z-10"></div>
+          </div>
+        `,
+      });
+    });
+  }, []);
 
   const getCurrentLocation = () => {
     return new Promise((resolve, reject) => {
-      if (!navigator.geolocation) {
+      if (typeof window === 'undefined' || !navigator.geolocation) {
         reject(new Error('Geolocation is not supported by your browser'));
       } else {
         navigator.geolocation.getCurrentPosition(
@@ -64,7 +99,6 @@ const DoctorDashboard = () => {
       if (!placesResponse.data.features) {
         throw new Error("No hospitals found in your area");
       }
-
 
       // Filter unique hospitals and add distance calculation
       const uniqueHospitals = placesResponse.data.features.filter(
@@ -107,8 +141,11 @@ const DoctorDashboard = () => {
     return (R * c).toFixed(1); // Return distance in km with 1 decimal place
   };
 
+  // Only fetch hospitals on client-side
   useEffect(() => {
-    fetchNearbyHospitals();
+    if (typeof window !== 'undefined') {
+      fetchNearbyHospitals();
+    }
   }, []); // Fetch hospitals on component mount
 
   return (
@@ -180,7 +217,7 @@ const DoctorDashboard = () => {
               <h2 className="text-2xl font-bold">Live Location Tracking</h2>
             </div>
             <div className="h-[calc(100%-5rem)]">
-              {mapCenter[0] !== 0 && (
+              {mapCenter[0] !== 0 && currentLocationIconRef.current && hospitalIconRef.current && (
                 <MapContainer
                   center={mapCenter}
                   zoom={13}
@@ -193,19 +230,11 @@ const DoctorDashboard = () => {
                   />
                   {/* Current Location Marker */}
                   <Marker
-  position={mapCenter}
-  icon={L.divIcon({
-    className: 'current-location-marker',
-    html: `
-      <div style="position: relative;">
-        <div class="radar-wave"></div>
-        <div class="w-4 h-4 bg-blue-500 rounded-full border-2 border-white relative z-10"></div>
-      </div>
-    `,
-  })}
->
-  <Popup>Your Location</Popup>
-</Marker>
+                    position={mapCenter}
+                    icon={currentLocationIconRef.current}
+                  >
+                    <Popup>Your Location</Popup>
+                  </Marker>
 
                   {/* Hospital Markers */}
                   {hospitals.map((hospital, index) => (
@@ -215,15 +244,7 @@ const DoctorDashboard = () => {
                         hospital.properties.lat,
                         hospital.properties.lon
                       ]}
-                      icon={L.divIcon({
-                        className: 'current-location-marker',
-                        html: `
-                          <div style="position: relative;">
-                            <div class="radar-wave2"></div>
-                            <div class="w-4 h-4 bg-red-500 rounded-full border-2 border-white relative z-10"></div>
-                          </div>
-                        `,
-                      })}
+                      icon={hospitalIconRef.current}
                     >
                       <Popup>
                         <div className="text-gray-900">
@@ -234,7 +255,7 @@ const DoctorDashboard = () => {
                       </Popup>
                     </Marker>
                   ))}
-                  <MapUpdater center={mapCenter} />
+                  <MapUpdaterComponent center={mapCenter} />
                 </MapContainer>
               )}
             </div>
@@ -246,4 +267,3 @@ const DoctorDashboard = () => {
 };
 
 export default DoctorDashboard;
-
